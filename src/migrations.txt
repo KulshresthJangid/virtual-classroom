@@ -1,0 +1,5 @@
+
+// TO CREATE A MIGRATION FILe
+ npx knex migrate:make create_users_table --knexfile ./src/knexFile.ts
+
+ 
