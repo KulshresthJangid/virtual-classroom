@@ -1,8 +1,7 @@
 import * as mysql from 'mysql';
 import { IBaseModel } from '../../model-typings/IBaseModel';
-import { IUsers } from '../../core-typings/IUsers';
 
-export abstract class BaseRaw<T extends { id?: string }> implements IBaseModel<T> {
+export abstract class BaseRaw<T extends { id?: number }> implements IBaseModel<T> {
     protected mysqlConnection: mysql.Connection;
     protected tableName: string;
 
@@ -18,15 +17,18 @@ export abstract class BaseRaw<T extends { id?: string }> implements IBaseModel<T
     async insert(data: T): Promise<T> {
         try {
             return await new Promise((resolve, reject) => {
-                this.mysqlConnection.query(`INSERT INTO ${this.tableName} SET ?`, data, (err, result) => {
-                    if(err) {
+                this.mysqlConnection.query(`INSERT INTO ${this.tableName} SET ?`, data, async (err, result) => {
+                    if (err) {
                         reject(err);
                     } else {
-                        resolve(result);
+                        const savedEntry = await this.findById(result.insertId);
+                        if(savedEntry) {
+                            resolve(savedEntry);
+                        }
                     }
-                });    
+                });
             })
-            
+
         } catch (error) {
             throw new Error(`Error while Inserting in table ${this.tableName} ${error}`);
         }
@@ -42,7 +44,7 @@ export abstract class BaseRaw<T extends { id?: string }> implements IBaseModel<T
 
     async delete(id: T['id']): Promise<void> {
         try {
-            this.mysqlConnection.query(`DELETE FROM ${this.tableName} WHERE id = ?`, [id]);
+            this.mysqlConnection.query(`UPDATE ${this.tableName} SET is_enabled = false WHERE id = ?`, [id]);
         } catch (error) {
             throw new Error(`Error while Deleting in table ${this.tableName}`);
         }
@@ -51,17 +53,17 @@ export abstract class BaseRaw<T extends { id?: string }> implements IBaseModel<T
     async findById(id: T['id']): Promise<T | null> {
         try {
             const results: T[] = await new Promise((resolve, reject) => {
-                this.mysqlConnection.query(`SELECT * FROM ${this.tableName} WHERE id = ?`, [id], (err, result) => {
-                    if(err) {
+                this.mysqlConnection.query(`SELECT * FROM ${this.tableName} WHERE id = ? AND is_enabled = true`, [id], (err, result) => {
+                    if (err) {
                         reject(err);
                     } else {
                         resolve(result)
                     }
                 });
             });
-            return results.length > 0 ? results[0]: null;
+            return results.length > 0 ? results[0] : null;
         } catch (error) {
-            throw new Error(`Error while Finding in table ${this.tableName}`);
+            throw new Error(`Error while Finding in table ${this.tableName} ${error}`);
         }
     }
 }

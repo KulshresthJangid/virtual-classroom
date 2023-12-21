@@ -1,6 +1,6 @@
 export interface IBase {
-    id?: string;
-    createdAt: Date;
-    updatedAt: Date;
-    isEnabled: boolean;
+    id?: number;
+    created_at: Date;
+    updated_at: Date;
+    is_enabled: boolean;
 }

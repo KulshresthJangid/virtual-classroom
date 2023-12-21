@@ -15,9 +15,9 @@ export const registerController = async (req: Request, res: Response) => {
             username: username,
             password: await encryptPass(password),
             role: role,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            isEnabled: true
+            created_at: new Date(),
+            updated_at: new Date(),
+            is_enabled: true
         };
         const newUser = await UsersEntity.insert(user);
         const token = await jwt.sign({ user_id: newUser.id }, jwtSecretKey, { expiresIn: 60 * 60 });
@@ -41,7 +41,7 @@ export const loginController = async (req: Request, res: Response) => {
     console.log("savedPass", user.password, "password", password)
     const isCorrectPass = await checkPass(user.password, password);
     if (!isCorrectPass) {
-        res.status(401).send({
+        return res.status(401).send({
             success: false,
             msg: "Invalid username or password",
         });
