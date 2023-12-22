@@ -15,7 +15,7 @@ export class SubmissionDetails extends BaseRaw<ISubmissionDetails> implements IS
             console.log("assignmentiod", assignmentId)
             return new Promise((resolve, reject) => {
                 let query = `SELECT * FROM ${this.tableName} WHERE student_username = ? AND assignment_id = ? AND is_enabled = true`;
-                let inputArr = [studentUsername, assignmentId]
+                const inputArr = [studentUsername, assignmentId]
                 if (status) {
                     query += ` AND status = ?`;
                     inputArr.push(status);
@@ -68,7 +68,7 @@ export class SubmissionDetails extends BaseRaw<ISubmissionDetails> implements IS
         try {
             return new Promise((resolve, reject) => {
                 let query = `SELECT * FROM ${this.tableName} WHERE student_username = ? AND is_enabled = true`;
-                let inputArr = [studentUsername];
+                const inputArr = [studentUsername];
                 if (submissionStatus) {
                     query += ` AND status = ?`;
                     inputArr.push(submissionStatus);

@@ -1,4 +1,3 @@
-// src/server.ts
 import express from 'express';
 import { Knex } from 'knex';
 import config from './knexFile';

@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { IUsers } from "../core-typings/IUsers";
 import { UsersEntity } from "../models/Users";
 import { IAssignmentDetails } from '../core-typings/IAssignmentDetails';
@@ -76,7 +76,11 @@ export const createAssignment = async (req: Request, res: Response) => {
             });
             return;
         } catch (error) {
-
+            console.log("Error while creating assignment", error);
+            res.status(500).send({
+                success: false,
+                msg: "Internal server error."
+            })
         }
     } else {
         res.status(500).send({
@@ -86,7 +90,7 @@ export const createAssignment = async (req: Request, res: Response) => {
     }
 }
 
-export const updateAssignment = async (req: Request, res: Response, next: NextFunction) => {
+export const updateAssignment = async (req: Request, res: Response) => {
     const { user }: { user: IUsers } = res.locals as { user: IUsers };
     const { id, description, publishedAt, deadlineAt, students }: { id: number, description: string, publishedAt: Date, deadlineAt: Date, students: string[] } = req.body;
 
@@ -141,7 +145,6 @@ export const updateAssignment = async (req: Request, res: Response, next: NextFu
 }
 
 export const deleteAssignment = async (req: Request, res: Response) => {
-    const { user }: { user: IUsers } = res.locals as { user: IUsers };
     const { id }: { id?: number } = req.query;
 
     try {
