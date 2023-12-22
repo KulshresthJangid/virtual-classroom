@@ -6,6 +6,7 @@ import { AssignmentDetailsEntity } from '../models/AssignmentDetails';
 import { ISubmissionDetails } from '../core-typings/ISubmissionDetails';
 import { SubmissionStatus } from '../enums/SubmissionStatus';
 import { SubmissionDetailsEntity } from '../models/SubmissionDetails';
+import { getAssignmentStatus } from '../helpers/assignmentHelpers';
 
 
 export const createAssignment = async (req: Request, res: Response) => {
@@ -17,6 +18,7 @@ export const createAssignment = async (req: Request, res: Response) => {
             description,
             published_at: new Date(publishedAt),
             deadline_at: new Date(deadlineAt),
+            status: await getAssignmentStatus(new Date(publishedAt)),
             tutor_id: user.id,
             created_at: new Date(),
             updated_at: new Date(),
@@ -38,8 +40,7 @@ export const createAssignment = async (req: Request, res: Response) => {
                         }
                         await SubmissionDetailsEntity.insert(submission);
                     }
-                })
-
+                });
             }
             res.status(201).send({
                 success: true,
@@ -74,6 +75,7 @@ export const updateAssignment = async (req: Request, res: Response, next: NextFu
         const updateAssignment: IAssignmentDetails = {
             published_at: publishedAt ? new Date(publishedAt) : existingAssignment.published_at,
             deadline_at: deadlineAt ? new Date(deadlineAt) : existingAssignment.deadline_at,
+            status: publishedAt ? await getAssignmentStatus(new Date(publishedAt)) : existingAssignment.status,
             description: description || existingAssignment.description,
             tutor_id: existingAssignment.tutor_id,
             created_at: existingAssignment.created_at,
@@ -101,9 +103,40 @@ export const updateAssignment = async (req: Request, res: Response, next: NextFu
         res.status(201).send({
             success: true,
             msg: "Assignment Updated successfully.",
-        })
+        });
+        return;
     } else {
-
+        res.status(400).send({
+            success: false,
+            msg: "Bad Request",
+        });
     }
+}
+
+export const deleteAssignment = async (req: Request, res: Response) => {
+    const { user }: { user: IUsers } = res.locals as { user: IUsers };
+    const { id }: { id?: number } = req.query;
+
+    try {
+        if (id) {
+            const assignment = await AssignmentDetailsEntity.findById(id);
+            if (assignment) {
+                await AssignmentDetailsEntity.delete(id);
+                await SubmissionDetailsEntity.deleteByAssignmentId(id);
+            }
+            res.send({
+                success: false,
+                msg: "Assignment Deleted successfully",
+            })
+
+        }
+    } catch (error) {
+        res.status(500).send({
+            success: false,
+            msg: "Unexpected Error while deleting assignment.",
+        })
+        throw new Error(`Error while Deleting assignment with id ${id} ${error}`);
+    }
+    return;
 
 }

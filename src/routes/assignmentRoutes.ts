@@ -7,13 +7,15 @@ import { UsersEntity } from '../models/Users';
 import { ISubmissionDetails } from '../core-typings/ISubmissionDetails';
 import { SubmissionStatus } from '../enums/SubmissionStatus';
 import { SubmissionDetailsEntity } from '../models/SubmissionDetails';
-import { createAssignment, updateAssignment } from '../controllers/assignmentController';
+import { createAssignment, deleteAssignment, updateAssignment } from '../controllers/assignmentController';
 
 const router = express.Router();
 
 router.post('/assignment', auth, createAssignment);
 
 router.put('/assignment', auth, updateAssignment);
+
+router.delete('/assignment?:id', auth, deleteAssignment);
 
 
 export default router;

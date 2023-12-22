@@ -1,5 +1,6 @@
 import type { Knex } from "knex";
 import { SubmissionStatus } from "../enums/SubmissionStatus";
+import { AssignmentStatus } from "../enums/AssignmentStatus";
 
 
 export async function up(knex: Knex): Promise<void> {
@@ -9,12 +10,13 @@ export async function up(knex: Knex): Promise<void> {
         table.integer('tutor_id').unsigned().notNullable().references('id').inTable('users').index();
         table.dateTime('published_at').notNullable();
         table.dateTime('deadline_at').notNullable();
+        const statuses = Object.values(AssignmentStatus).map(el => el.toString());
+        table.enu('status', statuses);
         table.dateTime('created_at').defaultTo(knex.fn.now());
         table.dateTime('updated_at');
         table.boolean('is_enabled').defaultTo(true);
     });
 
-    // 2. Create assignment_submissions_details table
     await knex.schema.createTable('assignment_submissions_details', (table) => {
         table.increments('id').primary();
         table.string('student_username').notNullable().references('username').inTable('users').index();

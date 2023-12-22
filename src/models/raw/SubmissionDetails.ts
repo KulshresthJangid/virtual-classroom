@@ -1,3 +1,4 @@
+import { resolve } from "path";
 import { ISubmissionDetails } from "../../core-typings/ISubmissionDetails";
 import { ISubmissionDetailsModel } from "../../model-typings/ISubmissionDetailsModel";
 import { BaseRaw } from "./BaseRaw";
@@ -24,5 +25,20 @@ export class SubmissionDetails extends BaseRaw<ISubmissionDetails> implements IS
         }
     }
 
+    async deleteByAssignmentId(assignmentId: number): Promise<void> {
+        try {
+            return new Promise((resolve, reject) => {
+                this.mysqlConnection.query(`UPDATE ${this.tableName} SET is_enabled = false WHERE assignment_id = ?`, [assignmentId], (err, result) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(result);
+                    }
+                });
+            });
+        } catch (error) {
+            throw new Error(`Error while Delting submission with assignment id ${assignmentId} ${error}`);
+        }
+    }
 
 }
