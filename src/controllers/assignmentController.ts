@@ -9,6 +9,31 @@ import { SubmissionDetailsEntity } from '../models/SubmissionDetails';
 import { getAssignmentStatus } from '../helpers/assignmentHelpers';
 
 
+// TODO:
+
+// interface ICreateAssignmentRequest {
+//     user: IUsers;
+//     description: string;
+//     publishedAt: Date;
+//     deadlineAt: Date;
+//     students: string[];
+//   }
+  
+//   interface IUpdateAssignmentRequest {
+//     user: IUsers;
+//     id: number;
+//     description: string;
+//     publishedAt: Date;
+//     deadlineAt: Date;
+//     students: string[];
+//   }
+  
+//   interface IDeleteAssignmentRequest {
+//     user: IUsers;
+//     id?: number;
+//   }
+
+
 export const createAssignment = async (req: Request, res: Response) => {
     const { user }: { user: IUsers } = res.locals as { user: IUsers };
     const { description, publishedAt, deadlineAt, students }: { description: string, publishedAt: Date, deadlineAt: Date, students: string[] } = req.body;
