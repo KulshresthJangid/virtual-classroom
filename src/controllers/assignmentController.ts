@@ -29,7 +29,7 @@ export const createAssignment = async (req: Request, res: Response) => {
                     const studentDetails = await UsersEntity.findByUserName(studentName);
                     if (studentDetails && studentDetails.id) {
                         const submission: ISubmissionDetails = {
-                            student_id: studentDetails.id,
+                            student_username: studentDetails.username,
                             assignment_id: newAssignment.id || 0,
                             status: SubmissionStatus.Pending,
                             created_at: new Date(),
@@ -44,6 +44,7 @@ export const createAssignment = async (req: Request, res: Response) => {
             res.status(201).send({
                 success: true,
                 newAssignment,
+                students,
             });
             return;
         } catch (error) {
@@ -81,21 +82,18 @@ export const updateAssignment = async (req: Request, res: Response, next: NextFu
         };
         await AssignmentDetailsEntity.update(existingAssignment.id, updateAssignment);
         if (students && students.length > 0) {
-            await students.forEach(async (student) => {
-                const studentDetails = await UsersEntity.findByUserName(student);
-                if (studentDetails && studentDetails.id) {
-                    const studentSubmission = await SubmissionDetailsEntity.findByStudentIdAndAssignmentId(studentDetails.id, existingAssignment.id ? existingAssignment.id : 0);
-                    if (!studentSubmission) {
-                        const submission: ISubmissionDetails = {
-                            student_id: studentDetails.id,
-                            assignment_id: existingAssignment.id || 0,
-                            status: SubmissionStatus.Pending,
-                            created_at: new Date(),
-                            updated_at: new Date(),
-                            is_enabled: true,
-                        }
-                        await SubmissionDetailsEntity.insert(submission);
+            await students.forEach(async (studentUsername) => {
+                const studentSubmission = await SubmissionDetailsEntity.findByStudentUsernameAndAssignmentId(studentUsername, existingAssignment.id ? existingAssignment.id : 0);
+                if (!studentSubmission) {
+                    const submission: ISubmissionDetails = {
+                        student_username: studentUsername,
+                        assignment_id: existingAssignment.id || 0,
+                        status: SubmissionStatus.Pending,
+                        created_at: new Date(),
+                        updated_at: new Date(),
+                        is_enabled: true,
                     }
+                    await SubmissionDetailsEntity.insert(submission);
                 }
             })
 

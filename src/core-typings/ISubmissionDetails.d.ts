@@ -3,7 +3,7 @@ import { SubmissionStatus } from "../enums/SubmissionStatus";
 import { IBase } from "./IBase";
 
 export interface ISubmissionDetails extends IBase {
-    student_id: number;
+    student_username: string;
     assignment_id: number;
     status: SubmissionStatus;
 }

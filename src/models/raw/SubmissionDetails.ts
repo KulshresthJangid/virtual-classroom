@@ -7,14 +7,14 @@ export class SubmissionDetails extends BaseRaw<ISubmissionDetails> implements IS
     constructor(db: mysql.Connection, tableName: string) {
         super(db, tableName);
     }
-    findByStudentIdAndAssignmentId(studnentId: number, assignmentId: number): Promise<ISubmissionDetails> {
+    findByStudentUsernameAndAssignmentId(studentUsername: string, assignmentId: number): Promise<ISubmissionDetails> {
         try {
             return new Promise((resolve, reject) => {
-                this.mysqlConnection.query(`SELECT * FROM ${this.tableName} WHERE student_id = ? AND assignment_id = ? AND is_enabled = true`, [studnentId, assignmentId], (err, result) => {
+                this.mysqlConnection.query(`SELECT * FROM ${this.tableName} WHERE student_username = ? AND assignment_id = ? AND is_enabled = true`, [studentUsername, assignmentId], (err, result) => {
                     if (err) {
                         reject(err);
                     } else {
-                        resolve(result);
+                        resolve(result[0]);
                     }
                 });
             });
@@ -23,4 +23,6 @@ export class SubmissionDetails extends BaseRaw<ISubmissionDetails> implements IS
             throw new Error("Error while getting submission by student id and assignment id " + error);
         }
     }
+
+
 }
