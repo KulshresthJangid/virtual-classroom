@@ -25,6 +25,7 @@ export async function up(knex: Knex): Promise<void> {
         const statuses = Object.values(SubmissionStatus).map(status => status.toString());
         table.enu('status', statuses);  // Change 'enum' to 'enu'
 
+        table.bigint('remarks');
         table.dateTime('created_at').defaultTo(knex.fn.now());
         table.dateTime('updated_at');
         table.boolean('is_enabled').defaultTo(true);

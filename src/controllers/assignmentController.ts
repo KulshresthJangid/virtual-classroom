@@ -163,5 +163,4 @@ export const deleteAssignment = async (req: Request, res: Response) => {
         throw new Error(`Error while Deleting assignment with id ${id} ${error}`);
     }
     return;
-
 }
