@@ -7,4 +7,10 @@ export interface ISubmissionDetailsModel extends IBaseModel<ISubmissionDetails> 
 
     deleteByAssignmentId(assignmentId: number): Promise<void>;
 
+    findByStudentUsername(studentUsername: string): Promise<ISubmissionDetails[] | null>;
+
+    findByAssignmentId(assignmentId: number): Promise<ISubmissionDetails[] | null>;
+
+    findByStudentUsernameWithAssignmentDetails(studentUsername: string): Promise<ISubmissionDetails[] | null>;
+
 }

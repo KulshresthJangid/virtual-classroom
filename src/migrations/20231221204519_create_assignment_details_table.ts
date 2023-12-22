@@ -23,8 +23,9 @@ export async function up(knex: Knex): Promise<void> {
         table.integer('assignment_id').unsigned().notNullable().references('id').inTable('assignment_details').index();
 
         const statuses = Object.values(SubmissionStatus).map(status => status.toString());
-        table.enu('status', statuses);  // Change 'enum' to 'enu'
+        table.enu('status', statuses);
 
+        table.string('content');
         table.bigint('remarks');
         table.dateTime('created_at').defaultTo(knex.fn.now());
         table.dateTime('updated_at');

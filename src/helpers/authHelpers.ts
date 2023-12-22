@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import { UserRoles } from '../enums/UserRoles';
 
 export const encryptPass = async (pass: string): Promise<string> => {
     return new Promise((resolve, reject) => {

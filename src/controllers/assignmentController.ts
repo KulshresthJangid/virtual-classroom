@@ -7,6 +7,8 @@ import { ISubmissionDetails } from '../core-typings/ISubmissionDetails';
 import { SubmissionStatus } from '../enums/SubmissionStatus';
 import { SubmissionDetailsEntity } from '../models/SubmissionDetails';
 import { getAssignmentStatus } from '../helpers/assignmentHelpers';
+import { UserRoles } from '../enums/UserRoles';
+import { AssignmentStatus } from '../enums/AssignmentStatus';
 
 
 // TODO:
@@ -18,7 +20,7 @@ import { getAssignmentStatus } from '../helpers/assignmentHelpers';
 //     deadlineAt: Date;
 //     students: string[];
 //   }
-  
+
 //   interface IUpdateAssignmentRequest {
 //     user: IUsers;
 //     id: number;
@@ -27,7 +29,7 @@ import { getAssignmentStatus } from '../helpers/assignmentHelpers';
 //     deadlineAt: Date;
 //     students: string[];
 //   }
-  
+
 //   interface IDeleteAssignmentRequest {
 //     user: IUsers;
 //     id?: number;
@@ -163,4 +165,37 @@ export const deleteAssignment = async (req: Request, res: Response) => {
         throw new Error(`Error while Deleting assignment with id ${id} ${error}`);
     }
     return;
+}
+
+export const getAssignments = async (req: Request, res: Response) => {
+    const { user }: { user: IUsers } = res.locals as { user: IUsers };
+    const userRole: UserRoles = user.role;
+    const { status } = req.query as { status: AssignmentStatus };
+    switch (userRole) {
+        case UserRoles.Student:
+            const submissions: ISubmissionDetails[] | null = await SubmissionDetailsEntity.findByStudentUsernameWithAssignmentDetails(user.username, status);
+            res.status(200).send({
+                success: true,
+                assignments: submissions?.map(sub => sub.assignment),
+            })
+            break;
+        case UserRoles.Tutor:
+            try {
+                const assignments: IAssignmentDetails | null = await AssignmentDetailsEntity.findByTutorId(user.id ? user.id : 0);
+                res.status(200).send({
+                    success: true,
+                    assignments,
+                });
+                return;
+            } catch (error) {
+                console.log("error while gettin assigments", error);
+                res.status(500).send({
+                    success: false,
+                    msg: "Internal server error",
+                })
+            }
+            break;
+        default:
+            break;
+    }
 }

@@ -1,21 +1,17 @@
-import express, { Response, Request } from 'express';
-import { auth } from '../middlewares/middleware';
-import { IAssignmentDetails } from '../core-typings/IAssignmentDetails';
-import { IUsers } from '../core-typings/IUsers';
-import { AssignmentDetailsEntity } from '../models/AssignmentDetails';
-import { UsersEntity } from '../models/Users';
-import { ISubmissionDetails } from '../core-typings/ISubmissionDetails';
-import { SubmissionStatus } from '../enums/SubmissionStatus';
-import { SubmissionDetailsEntity } from '../models/SubmissionDetails';
-import { createAssignment, deleteAssignment, updateAssignment } from '../controllers/assignmentController';
+import express from 'express';
+import { auth, roleRequired } from '../middlewares/middleware';
+import { createAssignment, deleteAssignment, getAssignments, updateAssignment } from '../controllers/assignmentController';
+import { UserRoles } from '../enums/UserRoles';
 
 const router = express.Router();
 
-router.post('/assignment', auth, createAssignment);
+router.get('/assignments', auth, getAssignments);
 
-router.put('/assignment', auth, updateAssignment);
+router.post('/assignment', auth, roleRequired(UserRoles.Tutor), createAssignment);
 
-router.delete('/assignment?:id', auth, deleteAssignment);
+router.put('/assignment', auth, roleRequired(UserRoles.Tutor), updateAssignment);
+
+router.delete('/assignment?:id', auth, roleRequired(UserRoles.Tutor), deleteAssignment);
 
 
 export default router;

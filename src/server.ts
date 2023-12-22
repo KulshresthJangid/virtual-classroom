@@ -4,6 +4,7 @@ import { Knex } from 'knex';
 import config from './knexFile';
 import authRoutes from './routes/authRoutes'
 import assignmentRoutes from './routes/assignmentRoutes';
+import submissionRoutes from './routes/submissionRoutes';
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(authRoutes);
 app.use(assignmentRoutes);
+app.use(submissionRoutes);
 
 const port = process.env.PORT || 3000;
 

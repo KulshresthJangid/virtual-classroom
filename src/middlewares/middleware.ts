@@ -2,6 +2,7 @@ import express, { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { IUsers } from "../core-typings/IUsers";
 import { UsersEntity } from "../models/Users";
+import { UserRoles } from "../enums/UserRoles";
 
 const jwtSecretKey = process.env.JWT_KEY || 'mySecretKey';
 
@@ -21,7 +22,7 @@ export const auth: express.RequestHandler = async (req: Request, res: Response, 
         if (decode.exp && decode.exp <= Math.floor(Date.now() / 1000)) {
             return res.status(401).send({
                 success: false,
-                msg: "Token has  Expired",
+                msg: "Token has Expired",
             })
         }
         if (!userId) {
@@ -40,4 +41,18 @@ export const auth: express.RequestHandler = async (req: Request, res: Response, 
             msg: "Invalid token.",
         });
     }
+};
+
+export const roleRequired = (role: UserRoles) => {
+    return (req: Request, res: Response, next: NextFunction) => {
+        const { user } = res.locals as { user: IUsers };
+        if (user.role === role) {
+            next();
+        } else {
+            res.status(401).send({
+                success: false,
+                msg: "Missing necessary role required to access this URL",
+            });
+        }
+    };
 };
